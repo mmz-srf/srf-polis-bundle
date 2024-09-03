@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  php:
+    container_name: srf_polis_php
+    environment:
+      - PHP_IDE_CONFIG=serverName=localhost
+    build:
+      context: ./docker/php
+    volumes:
+      - ./:/var/www/symfony_docker:cached
+      - symfony_cache:/var/www/symfony_docker/var/cache
+      - ./docker/config/composer-auth.json:/var/www/.composer/auth.json
+      - ./docker/php/conf.d/xdebug.ini:/usr/local/etc/php/conf.d/xdebug-user-config.ini
+      - ./docker/php/conf.d/error_reporting.ini:/usr/local/etc/php/conf.d/error_reporting.ini
+volumes:
+  database_data:
+  symfony_cache:

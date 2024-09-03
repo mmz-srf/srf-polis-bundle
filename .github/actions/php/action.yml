@@ -1,0 +1,11 @@
+name: Setup PHP
+description: 'Setup PHP with required extensions, php.ini configuration, code-coverage support in GitHub Actions.'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+        extensions: mbstring, xml, intl, pdo, pdo_pgsql, filter, iconv, json, curl, sodium

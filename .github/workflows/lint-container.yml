@@ -1,0 +1,20 @@
+name: PHP Container Linter
+
+on: [pull_request]
+
+jobs:
+  container-linter:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # PHP
+      - uses: ./.github/actions/php
+
+      # Composer
+      - uses: ramsey/composer-install@v3
+
+      # Lint
+      - run: php bin/console lint:container

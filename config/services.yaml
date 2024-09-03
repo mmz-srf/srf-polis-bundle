@@ -1,0 +1,30 @@
+imports:
+    - { resource: ./parameters.yaml }
+
+services:
+    srf_polis.client_credentials_grant:
+        class: BenjaminFavre\OAuthHttpClient\GrantType\ClientCredentialsGrantType
+        arguments:
+            $client: '@polis.client'
+            $tokenUrl: '/oauth/v1/accesstoken?grant_type=client_credentials'
+            $clientId: '%srf_polis.api.clientId%'
+            $clientSecret: '%srf_polis.api.clientSecret%'
+
+    srf_polis.token_storage:
+        class: BenjaminFavre\OAuthHttpClient\TokensCache\SymfonyTokensCacheAdapter
+        autowire: true
+        arguments:
+            $cacheKey: 'srf_polis_token'
+
+    srf_polis.authenticated_http_client:
+        class: BenjaminFavre\OAuthHttpClient\OAuthHttpClient
+        arguments:
+            $client: '@polis.client'
+            $grant: '@srf_polis.client_credentials_grant'
+        calls:
+            - [ setCache, [ '@srf_polis.token_storage' ] ]
+
+
+    SRF\PolisBundle\Service\PolisClient:
+        arguments:
+            $client: '@srf_polis.authenticated_http_client'

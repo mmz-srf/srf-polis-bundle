@@ -1,0 +1,10 @@
+parameters:
+    level: 8
+    paths:
+        - config/
+        - src/
+    ignoreErrors:
+        -
+            identifier: missingType.iterableValue
+        -
+            '#Call to an undefined method Symfony\\Component\\Config\\Definition\\Builder\\NodeDefinition::children\(\).#'

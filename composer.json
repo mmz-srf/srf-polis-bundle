@@ -1,0 +1,64 @@
+{
+    "name": "pascalvb/srf-polis-bundle",
+    "type": "symfony-bundle",
+    "description": "API client for SRG SSR Polis API",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Pascal von Büren",
+            "email": "pascal.vonbueren@srf.ch",
+            "role": "Developer"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "support": {
+        "issues": "https://github.com/pascalvb/srf-polis-bundle/issues"
+    },
+    "require": {
+        "php": ">=8.3",
+        "benjaminfavre/oauth2-http-client": "^3.0",
+        "symfony/framework-bundle": "^7.1",
+        "symfony/http-client": "^7.1"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.64",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan": "^1.12",
+        "phpstan/phpstan-symfony": "^1.4",
+        "phpunit/phpunit": "^9.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "SRF\\PolisBundle\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SRF\\PolisBundle\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true,
+        "platform": {
+            "php": "8.3"
+        },
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "scripts": {
+        "cs-fix": [
+            "vendor/bin/php-cs-fixer fix --verbose"
+        ],
+        "analyse": [
+            "vendor/bin/phpstan analyse --memory-limit=-1 --configuration phpstan.neon"
+        ],
+        "check": [
+            "@cs-fix",
+            "@analyse"
+        ]
+    }
+}

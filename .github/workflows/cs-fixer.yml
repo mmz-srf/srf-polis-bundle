@@ -1,0 +1,22 @@
+name: CS Fixer
+
+on: [pull_request]
+
+jobs:
+  cs-fixer:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # PHP
+      - uses: ./.github/actions/php
+
+      # Composer
+      - uses: ramsey/composer-install@v3
+
+      # PHP CS Fixer
+      - name: Run phpcs
+        run: |
+          vendor/bin/php-cs-fixer fix --dry-run --verbose
