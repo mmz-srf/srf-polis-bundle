@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace SRF\PolisBundle\Service;
 
 use SRF\PolisBundle\Model\Polis\PolisCase;
