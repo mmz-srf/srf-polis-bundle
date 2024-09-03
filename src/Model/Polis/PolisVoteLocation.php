@@ -8,7 +8,8 @@ readonly class PolisVoteLocation
         public string $id,
         public string $locationName,
         public string $shortName,
-        public string $type,
+        public PolisVoteLocationType $type,
+        public ?string $parentLocationId,
         public ?float $electionPower = null,
     ) {
     }
@@ -19,7 +20,8 @@ readonly class PolisVoteLocation
             id: $data['id'],
             locationName: $data['LocationName'],
             shortName: $data['ShortName'],
-            type: $data['LocationType']['Value'],
+            type: PolisVoteLocationType::createFromArray($data['LocationType']),
+            parentLocationId: $data['ParentLocationID'] ?? null,
             electionPower: $data['ElectionPower'] ?? null,
         );
     }

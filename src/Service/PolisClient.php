@@ -2,9 +2,9 @@
 
 namespace SRF\PolisBundle\Service;
 
+use SRF\PolisBundle\Model\Polis\PolisCantonalResult;
 use SRF\PolisBundle\Model\Polis\PolisCase;
 use SRF\PolisBundle\Model\Polis\PolisResult;
-use SRF\PolisBundle\Model\Polis\PolisResultAbsolute;
 use SRF\PolisBundle\Model\Polis\PolisResultCondition;
 use SRF\PolisBundle\Model\Polis\PolisVotation;
 use SRF\PolisBundle\Model\Polis\PolisVoteLocation;
@@ -70,7 +70,22 @@ class PolisClient
                         }
                     }
                 }
-                $item['cantonalMajority'] = $cantonalMajority;
+
+                // calc relatives
+                $relatives = [
+                    'yes' => 0 === $cantonalMajority['yes']
+                        ? 0
+                        : 100 / ($cantonalMajority['yes'] + $cantonalMajority['no']) * $cantonalMajority['yes'],
+                    'no' => 0 === $cantonalMajority['no']
+                        ? 0
+                        : 100 / ($cantonalMajority['yes'] + $cantonalMajority['no']) * $cantonalMajority['no'],
+                ];
+
+                $item['cantonalMajority'] = [
+                    'absolute' => $cantonalMajority,
+                    'relative' => $relatives,
+                ];
+
                 $item['allFinalResults'] = $allResults;
 
                 $case['Votations'] = [
@@ -108,6 +123,7 @@ class PolisClient
         return new PolisCase(
             id: $caseData['id'],
             title: $caseData['Title'],
+            date: self::parsePolisDateTime($caseData['EventDate']),
             active: $caseData['active'],
             votations: array_map(fn ($votationData) => new PolisVotation(
                 id: $votationData['id'],
@@ -116,10 +132,24 @@ class PolisClient
                 location: PolisVoteLocation::createFromArray($votationData['VotationLocation']),
                 type: isset($votationData['VoteType']) ? PolisVoteType::createFromArray($votationData['VoteType']) : null,
                 mainResult: isset($votationData['VotationMainResult']) ? PolisResult::createFromArray($votationData['VotationMainResult']) : null,
-                cantonalResult: isset($votationData['cantonalMajority']) ? new PolisResultAbsolute(yes: $votationData['cantonalMajority']['yes'], no: $votationData['cantonalMajority']['no']) : null,
+                cantonalResult: isset($votationData['cantonalMajority']) ? PolisCantonalResult::createFromArray($votationData['cantonalMajority']) : null,
                 cantonalResults: isset($votationData['VotationCantonalResults']) ? array_map(fn ($cantonalResult) => PolisResult::createFromArray($cantonalResult), $votationData['VotationCantonalResults']) : null,
                 results: isset($votationData['allFinalResults']) ? array_map(fn ($cantonalResult) => PolisResult::createFromArray($cantonalResult), $votationData['allFinalResults']) : null,
             ), $caseData['Votations']['Votation'] ?? [])
         );
+    }
+
+    public static function parsePolisDateTime(string $dateString): ?\DateTimeImmutable
+    {
+        preg_match('/\/Date\((\d+)([+-]\d{4})?\)\//', $dateString, $matches);
+
+        if ($matches) {
+            $timestampMs = (int) $matches[1];
+            $timestampSec = $timestampMs / 1000;
+
+            return (new \DateTimeImmutable())->setTimestamp($timestampSec);
+        }
+
+        return null;
     }
 }

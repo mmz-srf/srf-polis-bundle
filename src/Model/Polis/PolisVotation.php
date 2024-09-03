@@ -11,7 +11,7 @@ readonly class PolisVotation
         public PolisVoteLocation $location,
         public ?PolisVoteType $type,
         public ?PolisResult $mainResult,
-        public ?PolisResultAbsolute $cantonalResult,
+        public ?PolisCantonalResult $cantonalResult,
         /** @var array<PolisResult> */
         public ?array $cantonalResults,
         /** @var array<PolisResult> */

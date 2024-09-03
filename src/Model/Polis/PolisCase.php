@@ -7,6 +7,7 @@ readonly class PolisCase
     public function __construct(
         public string $id,
         public string $title,
+        public ?\DateTimeImmutable $date,
         public bool $active,
         /** @var array<PolisVotation> */
         public array $votations,

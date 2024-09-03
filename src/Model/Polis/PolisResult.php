@@ -2,6 +2,8 @@
 
 namespace SRF\PolisBundle\Model\Polis;
 
+use SRF\PolisBundle\Service\PolisClient;
+
 readonly class PolisResult
 {
     public function __construct(
@@ -29,21 +31,7 @@ readonly class PolisResult
             ),
             dataCondition: PolisDataCondition::from($data['DataCondition']['id']),
             resultCondition: PolisResultCondition::from($data['ResultCondition']['id']),
-            updatedAt: isset($data['LastUpdate']) ? self::parsePolisDateTime($data['LastUpdate']) : null,
+            updatedAt: isset($data['LastUpdate']) ? PolisClient::parsePolisDateTime($data['LastUpdate']) : null,
         );
-    }
-
-    private static function parsePolisDateTime(string $dateString): ?\DateTimeImmutable
-    {
-        preg_match('/\/Date\((\d+)([+-]\d{4})?\)\//', $dateString, $matches);
-
-        if ($matches) {
-            $timestampMs = (int) $matches[1];
-            $timestampSec = $timestampMs / 1000;
-
-            return (new \DateTimeImmutable())->setTimestamp($timestampSec);
-        }
-
-        return null;
     }
 }
