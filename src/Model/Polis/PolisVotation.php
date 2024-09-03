@@ -14,6 +14,8 @@ readonly class PolisVotation
         public ?PolisResultAbsolute $cantonalResult,
         /** @var array<PolisResult> */
         public ?array $cantonalResults,
+        /** @var array<PolisResult> */
+        public ?array $results,
     ) {
     }
 }

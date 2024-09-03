@@ -3,11 +3,9 @@
 namespace SRF\PolisBundle\Service;
 
 use SRF\PolisBundle\Model\Polis\PolisCase;
-use SRF\PolisBundle\Model\Polis\PolisDataCondition;
 use SRF\PolisBundle\Model\Polis\PolisResult;
 use SRF\PolisBundle\Model\Polis\PolisResultAbsolute;
 use SRF\PolisBundle\Model\Polis\PolisResultCondition;
-use SRF\PolisBundle\Model\Polis\PolisResultRelative;
 use SRF\PolisBundle\Model\Polis\PolisVotation;
 use SRF\PolisBundle\Model\Polis\PolisVoteLocation;
 use SRF\PolisBundle\Model\Polis\PolisVoteType;
@@ -34,7 +32,7 @@ class PolisClient
         };
     }
 
-    public function fetchPolisVotationById(string $id, string $language): PolisVotation
+    public function fetchCaseByVotationId(string $id, string $language): PolisCase
     {
         $votationResponse = $this->client->request('GET', sprintf('/polis-api/v2/votations/%s?lang=%s', $id, $this->translatePolisLanguageCode($language)));
         $data = $votationResponse->toArray();
@@ -50,10 +48,11 @@ class PolisClient
                     'yes' => 0,
                     'no' => 0,
                 ];
-
+                $allResults = [];
                 foreach ($item['Results'] as $result) {
                     if ('Item3' === $result['dataConditionID']) {
                         foreach ($result['Result'] as $resultItem) {
+                            $allResults[] = $resultItem;
                             if ($resultItem['Location']['id'] === $item['VotationLocation']['id']) {
                                 $item['VotationMainResult'] = $resultItem;
                             }
@@ -72,6 +71,7 @@ class PolisClient
                     }
                 }
                 $item['cantonalMajority'] = $cantonalMajority;
+                $item['allFinalResults'] = $allResults;
 
                 $case['Votations'] = [
                     'Votation' => [$item],
@@ -79,7 +79,12 @@ class PolisClient
             }
         }
 
-        return $this->denormalizePolisCase($case)->votations[0];
+        return $this->denormalizePolisCase($case);
+    }
+
+    public function fetchPolisVotationById(string $id, string $language): PolisVotation
+    {
+        return $this->fetchCaseByVotationId($id, $language)->votations[0];
     }
 
     public function fetchPolisCaseById(string $id, string $language = 'de'): PolisCase
@@ -100,7 +105,7 @@ class PolisClient
 
     private function denormalizePolisCase(array $caseData): PolisCase
     {
-        $case = new PolisCase(
+        return new PolisCase(
             id: $caseData['id'],
             title: $caseData['Title'],
             active: $caseData['active'],
@@ -108,61 +113,13 @@ class PolisClient
                 id: $votationData['id'],
                 title: $votationData['Title'],
                 individualTitle: $votationData['IndividualTitle'],
-                location: new PolisVoteLocation(
-                    id: $votationData['VotationLocation']['id'],
-                    locationName: $votationData['VotationLocation']['LocationName'],
-                    shortName: $votationData['VotationLocation']['ShortName'],
-                    type: $votationData['VotationLocation']['LocationType']['Value'],
-                ),
-                type: isset($votationData['VoteType']) ? new PolisVoteType(
-                    id: $votationData['VoteType']['id'],
-                    name: $votationData['VoteType']['Name'],
-                    scoreMore: $votationData['VoteType']['ScoreMore']
-                ) : null,
-                mainResult: isset($votationData['VotationMainResult']) ? new PolisResult(
-                    location: new PolisVoteLocation(
-                        id: $votationData['VotationLocation']['id'],
-                        locationName: $votationData['VotationLocation']['LocationName'],
-                        shortName: $votationData['VotationLocation']['ShortName'],
-                        type: $votationData['VotationLocation']['LocationType']['Value'],
-                        electionPower: $votationData['VotationLocation']['ElectionPower'] ?? null,
-                    ),
-                    absolute: new PolisResultAbsolute(
-                        yes: $votationData['VotationMainResult']['Absolute']['Yes'],
-                        no: $votationData['VotationMainResult']['Absolute']['No'],
-                    ),
-                    relative: new PolisResultRelative(
-                        yes: $votationData['VotationMainResult']['Relative']['Yes'],
-                        no: $votationData['VotationMainResult']['Relative']['No'],
-                        participation: $votationData['VotationMainResult']['Relative']['Participation'] ?? null,
-                    ),
-                    dataCondition: PolisDataCondition::from($votationData['VotationMainResult']['DataCondition']['id']),
-                    resultCondition: PolisResultCondition::from($votationData['VotationMainResult']['ResultCondition']['id']),
-                ) : null,
+                location: PolisVoteLocation::createFromArray($votationData['VotationLocation']),
+                type: isset($votationData['VoteType']) ? PolisVoteType::createFromArray($votationData['VoteType']) : null,
+                mainResult: isset($votationData['VotationMainResult']) ? PolisResult::createFromArray($votationData['VotationMainResult']) : null,
                 cantonalResult: isset($votationData['cantonalMajority']) ? new PolisResultAbsolute(yes: $votationData['cantonalMajority']['yes'], no: $votationData['cantonalMajority']['no']) : null,
-                cantonalResults: isset($votationData['VotationCantonalResults']) ? array_map(fn ($cantonalResult) => new PolisResult(
-                    location: new PolisVoteLocation(
-                        id: $cantonalResult['Location']['id'],
-                        locationName: $cantonalResult['Location']['LocationName'],
-                        shortName: $cantonalResult['Location']['ShortName'],
-                        type: $cantonalResult['Location']['LocationType']['Value'],
-                        electionPower: $cantonalResult['Location']['ElectionPower'] ?? null,
-                    ),
-                    absolute: new PolisResultAbsolute(
-                        yes: $cantonalResult['Absolute']['Yes'],
-                        no: $cantonalResult['Absolute']['No'],
-                    ),
-                    relative: new PolisResultRelative(
-                        yes: $cantonalResult['Relative']['Yes'],
-                        no: $cantonalResult['Relative']['No'],
-                        participation: $cantonalResult['Relative']['Participation'] ?? null,
-                    ),
-                    dataCondition: PolisDataCondition::from($cantonalResult['DataCondition']['id']),
-                    resultCondition: PolisResultCondition::from($cantonalResult['ResultCondition']['id']),
-                ), $votationData['VotationCantonalResults']) : null,
+                cantonalResults: isset($votationData['VotationCantonalResults']) ? array_map(fn ($cantonalResult) => PolisResult::createFromArray($cantonalResult), $votationData['VotationCantonalResults']) : null,
+                results: isset($votationData['allFinalResults']) ? array_map(fn ($cantonalResult) => PolisResult::createFromArray($cantonalResult), $votationData['allFinalResults']) : null,
             ), $caseData['Votations']['Votation'] ?? [])
         );
-
-        return $case;
     }
 }

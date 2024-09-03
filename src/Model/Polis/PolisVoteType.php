@@ -10,4 +10,13 @@ readonly class PolisVoteType
         public bool $scoreMore,
     ) {
     }
+
+    public static function createFromArray(array $data): self
+    {
+        return new self(
+            id: $data['id'],
+            name: $data['Name'],
+            scoreMore: $data['ScoreMore']
+        );
+    }
 }
