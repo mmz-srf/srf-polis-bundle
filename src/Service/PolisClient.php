@@ -32,7 +32,7 @@ class PolisClient
         };
     }
 
-    public function fetchCaseByVotationId(string $id, string $language): PolisCase
+    public function fetchPolisCaseByVotationId(int $id, string $language): PolisCase
     {
         $votationResponse = $this->client->request('GET', sprintf('/polis-api/v2/votations/%s?lang=%s', $id, $this->translatePolisLanguageCode($language)));
         $data = $votationResponse->toArray();
@@ -97,14 +97,14 @@ class PolisClient
         return $this->denormalizePolisCase($case);
     }
 
-    public function fetchPolisVotationById(string $id, string $language): PolisVotation
+    public function fetchPolisVotationById(int $id, string $language): PolisVotation
     {
-        return $this->fetchCaseByVotationId($id, $language)->votations[0];
+        return $this->fetchPolisCaseByVotationId($id, $this->translatePolisLanguageCode($language))->votations[0];
     }
 
-    public function fetchPolisCaseById(string $id, string $language = 'de'): PolisCase
+    public function fetchPolisCaseById(int $id, string $language = 'de'): PolisCase
     {
-        $caseData = $this->client->request('GET', sprintf('/polis-api/v2/cases/%s?lang=%s', $id, $language));
+        $caseData = $this->client->request('GET', sprintf('/polis-api/v2/cases/%s?lang=%s', $id, $this->translatePolisLanguageCode($language)));
         $data = $caseData->toArray();
 
         return $this->denormalizePolisCase($data['Case'][0]);
@@ -112,7 +112,11 @@ class PolisClient
 
     public function fetchPolisCases(string $language = 'de', bool $onlyActive = true): array
     {
-        $caseData = $this->client->request('GET', sprintf('/polis-api/v2/cases?lang=%s&listAllCases=%s', $language, $onlyActive ? 'false' : 'true'));
+        $caseData = $this->client->request('GET', sprintf(
+            '/polis-api/v2/cases?lang=%s&listAllCases=%s',
+            $this->translatePolisLanguageCode($language),
+            $onlyActive ? 'false' : 'true'
+        ));
         $data = $caseData->toArray();
 
         return array_map(fn ($caseData) => $this->denormalizePolisCase($caseData), $data['Case'] ?? []);
