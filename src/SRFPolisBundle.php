@@ -9,14 +9,12 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 
-/**
- * @psalm-suppress PartialBadTypeFromSignatureOnStrictFileIssue
- */
 class SRFPolisBundle extends AbstractBundle
 {
     public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
     {
         $container->parameters()
+            ->set('srf_polis.api.base_uri', $config['api']['baseUri'])
             ->set('srf_polis.api.clientId', $config['api']['clientId'])
             ->set('srf_polis.api.clientSecret', $config['api']['clientSecret']);
 
@@ -29,6 +27,9 @@ class SRFPolisBundle extends AbstractBundle
             ->children()
             ->arrayNode('api')
                 ->children()
+                    ->scalarNode('baseUri')
+                        ->defaultValue('https://api.srgssr.ch')
+                    ->end()
                     ->scalarNode('clientId')->end()
                     ->scalarNode('clientSecret')->end()
                 ->end()

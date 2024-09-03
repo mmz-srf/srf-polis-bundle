@@ -2,10 +2,21 @@ imports:
     - { resource: ./parameters.yaml }
 
 services:
+
+    srf_polis.http_client:
+        class: Symfony\Contracts\HttpClient\HttpClientInterface
+        factory: [Symfony\Component\HttpClient\HttpClient, create]
+        arguments:
+            $defaultOptions:
+                timeout: 2
+                base_uri: '%srf_polis.api.base_uri%'
+                headers:
+                    Content-Type: "application/json"
+
     srf_polis.client_credentials_grant:
         class: BenjaminFavre\OAuthHttpClient\GrantType\ClientCredentialsGrantType
         arguments:
-            $client: '@polis.client'
+            $client: '@srf_polis.http_client'
             $tokenUrl: '/oauth/v1/accesstoken?grant_type=client_credentials'
             $clientId: '%srf_polis.api.clientId%'
             $clientSecret: '%srf_polis.api.clientSecret%'
@@ -19,7 +30,7 @@ services:
     srf_polis.authenticated_http_client:
         class: BenjaminFavre\OAuthHttpClient\OAuthHttpClient
         arguments:
-            $client: '@polis.client'
+            $client: '@srf_polis.http_client'
             $grant: '@srf_polis.client_credentials_grant'
         calls:
             - [ setCache, [ '@srf_polis.token_storage' ] ]
