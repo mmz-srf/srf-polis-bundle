@@ -11,4 +11,14 @@ enum PolisDataCondition: string
     case CONDITION_WEB = 'Item5';
     case CONDITION_TREND = 'Item6';
     case CONDITION_UNDEF = 'Item7';
+
+    public function getId(): int
+    {
+        return intval(str_replace('Item', '', $this->value));
+    }
+
+    public function getLabel(): string
+    {
+        return $this->name;
+    }
 }

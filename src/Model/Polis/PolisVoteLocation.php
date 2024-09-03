@@ -5,11 +5,11 @@ namespace SRF\PolisBundle\Model\Polis;
 readonly class PolisVoteLocation
 {
     public function __construct(
-        public string $id,
+        public int $id,
         public string $locationName,
         public string $shortName,
         public PolisVoteLocationType $type,
-        public ?string $parentLocationId,
+        public ?int $parentLocationId,
         public ?float $electionPower = null,
     ) {
     }

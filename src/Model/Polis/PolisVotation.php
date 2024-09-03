@@ -5,7 +5,7 @@ namespace SRF\PolisBundle\Model\Polis;
 readonly class PolisVotation
 {
     public function __construct(
-        public string $id,
+        public int $id,
         public string $title,
         public string $individualTitle,
         public PolisVoteLocation $location,
