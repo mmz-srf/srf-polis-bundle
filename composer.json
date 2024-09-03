@@ -1,5 +1,5 @@
 {
-    "name": "pascalvb/srf-polis-bundle",
+    "name": "mmz-srf/srf-polis-bundle",
     "type": "symfony-bundle",
     "description": "API client for SRG SSR Polis API",
     "license": "MIT",
@@ -13,7 +13,7 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "support": {
-        "issues": "https://github.com/pascalvb/srf-polis-bundle/issues"
+        "issues": "https://github.com/mmz-srf/srf-polis-bundle/issues"
     },
     "require": {
         "php": ">=8.3",
