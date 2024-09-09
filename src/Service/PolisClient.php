@@ -149,7 +149,7 @@ class PolisClient
 
         if ($matches) {
             $timestampMs = (int) $matches[1];
-            $timestampSec = $timestampMs / 1000;
+            $timestampSec = intval(round($timestampMs / 1000));
 
             return (new \DateTimeImmutable())->setTimestamp($timestampSec);
         }

@@ -8,3 +8,4 @@ phpunit.xml
 .phpunit.result.cache
 ###< phpunit/general ###
 /.php-cs-fixer.cache
+/docker/config/composer-auth.json

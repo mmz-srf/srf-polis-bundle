@@ -21,12 +21,12 @@ readonly class PolisResult
         return new self(
             location: PolisVoteLocation::createFromArray($data['Location']),
             absolute: new PolisResultAbsolute(
-                yes: $data['Absolute']['Yes'],
-                no: $data['Absolute']['No'],
+                yes: $data['Absolute']['Yes'] ?? 0,
+                no: $data['Absolute']['No'] ?? 0,
             ),
             relative: new PolisResultRelative(
-                yes: $data['Relative']['Yes'],
-                no: $data['Relative']['No'],
+                yes: $data['Relative']['Yes'] ?? 0,
+                no: $data['Relative']['No'] ?? 0,
                 participation: $data['Relative']['Participation'] ?? null,
             ),
             dataCondition: PolisDataCondition::from($data['DataCondition']['id']),

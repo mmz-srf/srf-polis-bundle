@@ -18,8 +18,8 @@ readonly class PolisVoteLocation
     {
         return new self(
             id: $data['id'],
-            locationName: $data['LocationName'],
-            shortName: $data['ShortName'],
+            locationName: $data['LocationName'] ?? 'unbekannter Ort',
+            shortName: $data['ShortName'] ?? '??',
             type: PolisVoteLocationType::createFromArray($data['LocationType']),
             parentLocationId: $data['ParentLocationID'] ?? null,
             electionPower: $data['ElectionPower'] ?? null,

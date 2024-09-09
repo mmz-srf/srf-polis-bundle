@@ -10,15 +10,24 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 
 class PolisClientTest extends TestCase
 {
-    public function testPolisClientTransformsApiDataCorrectly(): void
+    /**
+     * @dataProvider polisCaseDataProvider
+     */
+    public function testPolisClientTransformsApiDataCorrectly($caseId, $data): void
     {
-        $id = '5007';
-        $testData = file_get_contents(__DIR__.'/Mocks/votation_'.$id.'.json');
-        $response = new MockResponse($testData);
+        $response = new MockResponse($data);
         $httpClient = new MockHttpClient($response);
         $polisClient = new PolisClient($httpClient);
-        $votation = $polisClient->fetchPolisVotationById($id, 'de');
+        $votation = $polisClient->fetchPolisVotationById($caseId, 'de');
         $this->assertInstanceOf(PolisVotation::class, $votation);
-        $this->assertEquals($id, $votation->id);
+        $this->assertEquals($caseId, $votation->id);
+    }
+
+    public function polisCaseDataProvider(): \Generator
+    {
+        $cases = ['1591', '5006', '5007'];
+        foreach ($cases as $caseId) {
+            yield [$caseId, file_get_contents(__DIR__.'/Mocks/votation_'.$caseId.'.json')];
+        }
     }
 }

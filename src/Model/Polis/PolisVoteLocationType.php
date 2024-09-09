@@ -14,7 +14,7 @@ readonly class PolisVoteLocationType
     {
         return new self(
             id: $data['id'],
-            value: $data['Value'],
+            value: $data['Value'] ?? 'Unbekannt',
         );
     }
 }
