@@ -24,17 +24,9 @@ class PolisClient
     ) {
     }
 
-    private function translatePolisLanguageCode(string $languageCode): string
-    {
-        return match ($languageCode) {
-            'rm' => 'rr',
-            default => $languageCode,
-        };
-    }
-
     public function fetchPolisCaseByVotationId(int $id, string $language): PolisCase
     {
-        $votationResponse = $this->client->request('GET', sprintf('/polis-api/v2/votations/%s?lang=%s', $id, $this->translatePolisLanguageCode($language)));
+        $votationResponse = $this->client->request('GET', sprintf('/polis-api/v2/votations/%s?lang=%s', $id, $language));
         $data = $votationResponse->toArray();
 
         $case = [];
@@ -99,12 +91,12 @@ class PolisClient
 
     public function fetchPolisVotationById(int $id, string $language): PolisVotation
     {
-        return $this->fetchPolisCaseByVotationId($id, $this->translatePolisLanguageCode($language))->votations[0];
+        return $this->fetchPolisCaseByVotationId($id, $language)->votations[0];
     }
 
     public function fetchPolisCaseById(int $id, string $language = 'de'): PolisCase
     {
-        $caseData = $this->client->request('GET', sprintf('/polis-api/v2/cases/%s?lang=%s', $id, $this->translatePolisLanguageCode($language)));
+        $caseData = $this->client->request('GET', sprintf('/polis-api/v2/cases/%s?lang=%s', $id, $language));
         $data = $caseData->toArray();
 
         return $this->denormalizePolisCase($data['Case'][0]);
@@ -114,7 +106,7 @@ class PolisClient
     {
         $caseData = $this->client->request('GET', sprintf(
             '/polis-api/v2/cases?lang=%s&listAllCases=%s',
-            $this->translatePolisLanguageCode($language),
+            $language,
             $onlyActive ? 'false' : 'true'
         ));
         $data = $caseData->toArray();
