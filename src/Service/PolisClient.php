@@ -24,9 +24,16 @@ class PolisClient
     ) {
     }
 
-    public function fetchPolisCaseByVotationId(int $id, string $language): PolisCase
+    public function fetchPolisCaseByVotationId(int $id, string $language, bool $fetchCommunalResultData = false): PolisCase
     {
-        $votationResponse = $this->client->request('GET', sprintf('/polis-api/v2/votations/%s?lang=%s', $id, $language));
+        // by default, Polis only delivers results for locations types 1 - 3 (national, cantonal and district)
+        $locationTypeIds = '1,2,3';
+        // if we need communal data (which we only do for communal votations), we need to explicitly request them
+        if ($fetchCommunalResultData) {
+            $locationTypeIds = '4';
+        }
+
+        $votationResponse = $this->client->request('GET', sprintf('/polis-api/v2/votations/%s?lang=%s&locationtypeid=%s', $id, $language, $locationTypeIds));
         $data = $votationResponse->toArray();
 
         $case = [];
@@ -35,6 +42,11 @@ class PolisClient
                 $case = $item;
             } elseif ('tpc.eMedia.PolisV2.Business.API.v1.Models.Export.Votation, tpc.eMedia.PolisV2.Business' === $item['__type']) {
                 $item['VotationCantonalResults'] = [];
+                $location = PolisVoteLocation::createFromArray($item['VotationLocation']);
+                // if this is a communal votation, we need to explicitly fetch communal result data (that gets ignored by default)
+                if (4 === $location->type->id && false === $fetchCommunalResultData) {
+                    return $this->fetchPolisCaseByVotationId($id, $language, true);
+                }
 
                 $cantonalMajority = [
                     'yes' => 0,
