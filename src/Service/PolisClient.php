@@ -115,14 +115,10 @@ class PolisClient
                     }
                 }
 
-                // calc relatives
+                // calc relatives (in relation to 23 cantons/half cantons)
                 $relatives = [
-                    'yes' => 0 === $cantonalMajority['yes']
-                        ? 0
-                        : 100 / ($cantonalMajority['yes'] + $cantonalMajority['no']) * $cantonalMajority['yes'],
-                    'no' => 0 === $cantonalMajority['no']
-                        ? 0
-                        : 100 / ($cantonalMajority['yes'] + $cantonalMajority['no']) * $cantonalMajority['no'],
+                    'yes' => 0 === $cantonalMajority['yes'] ? 0 : 100 / 23 * $cantonalMajority['yes'],
+                    'no' => 0 === $cantonalMajority['no'] ? 0 : 100 / 23 * $cantonalMajority['no'],
                 ];
 
                 $item['cantonalMajority'] = [
