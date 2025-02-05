@@ -79,7 +79,6 @@ class PolisClient
 
                     // if main result was NOT provided AND it's a national votation, we have to manually sum up the cantonal results
                     if (!isset($item['VotationMainResult']) && '1' === $item['VotationLocation']['id']) {
-
                         $absoluteYes = 0;
                         $absoluteNo = 0;
 
