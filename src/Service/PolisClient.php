@@ -54,9 +54,12 @@ class PolisClient
                 ];
                 $allResults = [];
                 foreach ($item['Results'] as $result) {
+                    // data condition = state of the result, e.g. prognosis, final result, ...
                     if ('Item3' === $result['dataConditionID']) {
                         foreach ($result['Result'] as $resultItem) {
                             $allResults[] = $resultItem;
+
+                            // hey look, the main result was provided:
                             if ($resultItem['Location']['id'] === $item['VotationLocation']['id']) {
                                 $item['VotationMainResult'] = $resultItem;
                             }
@@ -73,16 +76,48 @@ class PolisClient
                             }
                         }
                     }
+
+                    // if main result was NOT provided AND it's a national votation, we have to manually sum up the cantonal results
+                    if (!isset($item['VotationMainResult']) && '1' === $item['VotationLocation']['id']) {
+                        $absoluteYes = 0;
+                        $absoluteNo = 0;
+
+                        foreach ($item['VotationCantonalResults'] as $cantonalResult) {
+                            $absoluteYes += $cantonalResult['Absolute']['Yes'];
+                            $absoluteNo += $cantonalResult['Absolute']['No'];
+                        }
+
+                        $relativeYes = 0 === $absoluteYes
+                            ? 0
+                            : 100 / ($absoluteYes + $absoluteNo) * $absoluteYes;
+                        $relativeNo = 0 === $absoluteNo
+                            ? 0
+                            : 100 / ($absoluteYes + $absoluteNo) * $absoluteNo;
+
+                        $item['VotationMainResult'] = [
+                            'Location' => $item['VotationLocation'],
+                            'Absolute' => [
+                                'Yes' => $absoluteYes,
+                                'No' => $absoluteNo,
+                            ],
+                            'Relative' => [
+                                'Yes' => round($relativeYes, 1),
+                                'No' => round($relativeNo, 1),
+                            ],
+                            'DataCondition' => [
+                                'id' => 'Item3',
+                            ],
+                            'ResultCondition' => [
+                                'id' => 'Item1',
+                            ],
+                        ];
+                    }
                 }
 
-                // calc relatives
+                // calc relatives (in relation to 23 cantons/half cantons)
                 $relatives = [
-                    'yes' => 0 === $cantonalMajority['yes']
-                        ? 0
-                        : 100 / ($cantonalMajority['yes'] + $cantonalMajority['no']) * $cantonalMajority['yes'],
-                    'no' => 0 === $cantonalMajority['no']
-                        ? 0
-                        : 100 / ($cantonalMajority['yes'] + $cantonalMajority['no']) * $cantonalMajority['no'],
+                    'yes' => 0 === $cantonalMajority['yes'] ? 0 : 100 / 23 * $cantonalMajority['yes'],
+                    'no' => 0 === $cantonalMajority['no'] ? 0 : 100 / 23 * $cantonalMajority['no'],
                 ];
 
                 $item['cantonalMajority'] = [
