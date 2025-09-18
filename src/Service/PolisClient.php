@@ -83,8 +83,8 @@ class PolisClient
                         $absoluteNo = 0;
 
                         foreach ($item['VotationCantonalResults'] as $cantonalResult) {
-                            $absoluteYes += $cantonalResult['Absolute']['Yes'];
-                            $absoluteNo += $cantonalResult['Absolute']['No'];
+                            $absoluteYes += ($cantonalResult['Absolute']['Yes'] ?? 0);
+                            $absoluteNo += ($cantonalResult['Absolute']['No'] ?? 0);
                         }
 
                         $relativeYes = 0 === $absoluteYes
