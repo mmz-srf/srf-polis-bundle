@@ -9,3 +9,5 @@ phpunit.xml
 ###< phpunit/general ###
 /.php-cs-fixer.cache
 /docker/config/composer-auth.json
+
+.idea
