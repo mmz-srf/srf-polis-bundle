@@ -1,6 +1,6 @@
 # SRF Polis Bundle
 
-Integrates the [SRG SSR Polis API](https://developer.srgssr.ch/api-catalog/srgssr-polis) into Symfony, compatible with Symfony 7.
+Integrates the [SRG SSR Polis API](https://developer.srgssr.ch/api-catalog/srgssr-polis) into Symfony, compatible with Symfony 8.
 
 ## Table of Contents
 
@@ -9,9 +9,9 @@ Integrates the [SRG SSR Polis API](https://developer.srgssr.ch/api-catalog/srgss
 - [Quality Assurance](#quality-assurance)
 
 ## Requirements
-- PHP 8.3
+- PHP 8.4
 - Composer 2
-- Symfony 7
+- Symfony 8
 - Docker
 
 ## Installation
@@ -39,7 +39,7 @@ $ composer analyse
 
 ## License
 
-Copyright (c) 2024, SRF under [MIT](LICENSE) License
+Copyright (c) 2026, SRF under [MIT](LICENSE) License
 
 ## Contributing
 
