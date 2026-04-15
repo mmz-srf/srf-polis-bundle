@@ -25,15 +25,15 @@ class SRFPolisBundle extends AbstractBundle
     {
         $definition->rootNode()
             ->children()
-            ->arrayNode('api')
-                ->children()
-                    ->scalarNode('baseUri')
-                        ->defaultValue('https://api.srgssr.ch')
+                ->arrayNode('api')
+                    ->children()
+                        ->scalarNode('baseUri')
+                            ->defaultValue('https://api.srgssr.ch')
+                        ->end()
+                        ->scalarNode('clientId')->end()
+                        ->scalarNode('clientSecret')->end()
                     ->end()
-                    ->scalarNode('clientId')->end()
-                    ->scalarNode('clientSecret')->end()
                 ->end()
-            ->end()
-        ->end();
+            ->end();
     }
 }
