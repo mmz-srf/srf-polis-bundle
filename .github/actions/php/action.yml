@@ -7,5 +7,5 @@ runs:
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.4'
+        php-version: '8.3'
         extensions: mbstring, xml, intl, pdo, pdo_pgsql, filter, iconv, json, curl, sodium
