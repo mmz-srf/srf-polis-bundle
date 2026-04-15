@@ -1,4 +1,4 @@
-FROM php:8.3-apache
+FROM php:8.4-apache
 
 RUN apt update \
     && apt install -y zlib1g-dev g++ git libicu-dev libpq-dev zip libzip-dev libssl-dev librabbitmq-dev zip libxslt-dev \
